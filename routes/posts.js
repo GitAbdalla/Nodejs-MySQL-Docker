@@ -1,6 +1,7 @@
 const express = require("express");
 const postsController = require("../controllers/post.controller");
 const authMiddleware = require("../middlewares/authMiddleware");
+const upload = require('../middlewares/uploadImageMiddlware')
 const {
   createPostValidation,
   updatePostValidation,
@@ -14,6 +15,7 @@ const router = express.Router();
 router.post(
   "/",
   authMiddleware.checkAuth,
+  upload.single('image'),
   createPostValidation,
   validate,
   postsController.createPost

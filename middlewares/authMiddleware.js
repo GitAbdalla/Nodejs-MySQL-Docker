@@ -18,7 +18,6 @@ exports.checkAuth = async (req, res, next) => {
         message: "You are not logged in, please login to access this route",
       });
     }
-    console.log("Received token:", token);
 
     const decoded = jwt.verify(token, process.env.JWT_SERCRET);
 

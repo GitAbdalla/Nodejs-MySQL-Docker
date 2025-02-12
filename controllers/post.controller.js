@@ -2,8 +2,11 @@ const models= require("../models");
 
 exports.createPost = async (req, res) => {
   try {
-    const { title, content, imageUrl, categoryId } = req.body;
-    const userId = 1;
+    const { title, content,categoryId } = req.body;
+    const userId = req.user.id;
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+
+
 
     const result = await models.Post.create({
       title,
