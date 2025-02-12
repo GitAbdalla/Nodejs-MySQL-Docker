@@ -5,7 +5,7 @@ exports.createPost = async (req, res) => {
     const { title, content, imageUrl, categoryId } = req.body;
     const userId = 1;
 
-    const result = await Post.create({
+    const result = await models.Post.create({
       title,
       content,
       imageUrl,
