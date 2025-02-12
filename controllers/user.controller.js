@@ -44,6 +44,14 @@ exports.login = async (req, res) => {
     }
 
     const token = generateToken(email);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 3600000,
+    });
+    
     res.status(200).json({
       message: "Logged in successfully",
       user,
