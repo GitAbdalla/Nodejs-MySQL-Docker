@@ -22,7 +22,14 @@ exports.createPostValidation = [
     .isURL().withMessage('Image URL must be a valid URL'),
   body('categoryId')
     .notEmpty().withMessage('Category ID is required')
-    .isInt().withMessage('Category ID must be an integer'),
+    .isInt().withMessage('Category ID must be an integer')
+    .custom(async (value)=>{
+      const category = await models.Category.findOne({where:{id: value}});
+      if(!category){
+        return Promise.reject('There is no category with this id')
+      }
+    })
+    ,
 ];
 
 

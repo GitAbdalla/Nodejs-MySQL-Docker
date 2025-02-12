@@ -6,8 +6,6 @@ exports.createPost = async (req, res) => {
     const userId = req.user.id;
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
-
-
     const result = await models.Post.create({
       title,
       content,
