@@ -19,7 +19,7 @@ exports.checkAuth = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SERCRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     if (!decoded || !decoded.email) {
       return res.status(401).json({
@@ -30,6 +30,7 @@ exports.checkAuth = async (req, res, next) => {
     const currentUser = await models.User.findOne({
       where: { email: decoded.email },
     });
+
     if (!currentUser) {
       return res.status(401).json({
         message: "The user belonging to this token no longer exists",
@@ -40,6 +41,7 @@ exports.checkAuth = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.error("Error during token validation:", error.message);
     res.status(500).json({
       message: "Something went wrong",
       error: error.message,
