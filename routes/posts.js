@@ -1,6 +1,6 @@
 const express = require("express");
-const postsController = require("../controllers/post.controller");
-const authMiddleware = require("../middlewares/authMiddleware");
+const postsController = require("../controllers/postController");
+// const authMiddleware = require("../middlewares/authMiddleware");
 const upload = require('../middlewares/uploadImageMiddlware')
 const {
   createPostValidation,
@@ -9,12 +9,13 @@ const {
   deletePostValidation,
   validate,
 } = require("../validation/postValidator");
+const { checkAuth } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
 router.post(
   "/",
-  authMiddleware.checkAuth,
+  checkAuth,
   upload.single('image'),
   createPostValidation,
   validate,
@@ -24,14 +25,14 @@ router.get("/", postsController.getAllPosts);
 router.get("/:id", getPostValidation, validate, postsController.getPostById);
 router.put(
   "/:id",
-  authMiddleware.checkAuth,
+  checkAuth,
   updatePostValidation,
   validate,
   postsController.updatePost
 );
 router.delete(
   "/:id",
-  authMiddleware.checkAuth,
+  checkAuth,
   deletePostValidation,
   validate,
   postsController.deletePost
