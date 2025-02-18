@@ -1,8 +1,13 @@
-const models= require("../models");
+const models = require("../models");
+const {
+  applySearch,
+  applyFilters,
+  applyPagination,
+} = require("../utils/apiFeatures");
 
 exports.createPost = async (req, res) => {
   try {
-    const { title, content,categoryId } = req.body;
+    const { title, content, categoryId } = req.body;
     const userId = req.user.id;
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
@@ -26,9 +31,26 @@ exports.createPost = async (req, res) => {
 };
 exports.getAllPosts = async (req, res) => {
   try {
-    const posts = await models.Post.findAll();
+    const { page = 1, limit = 10, search, ...filters } = req.query;
+
+    const query = {
+      where: {},
+      include: [
+        { model: models.User, attributes: ["id", "name"] },
+        { model: models.Category, attributes: ["id", "name"] },
+      ],
+    };
+
+    applySearch(query, search, ["title", "content"]);
+    applyFilters(query, filters);
+    applyPagination(query, page, limit);
+
+    const { rows: posts, count } = await models.Post.findAndCountAll(query);
+
     res.status(200).json({
-      message: "Posts fetched successfully",
+      results:posts.length,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
       posts,
     });
   } catch (error) {
@@ -65,7 +87,7 @@ exports.getPostById = async (req, res) => {
 exports.updatePost = async (req, res) => {
   try {
     const postId = req.params.id;
-    
+
     const post = await models.Post.findByPk(postId);
 
     if (!post) {
@@ -73,18 +95,18 @@ exports.updatePost = async (req, res) => {
         message: "Post not found",
       });
     }
-   const updatePost = {
-    title : req.body.title,
-    content : req.body.content,
-    imageUrl : req.body.imageUrl,
-    categoryId : req.body.categoryId,
-   }
-   const userId = 1;
-    
+    const updatePost = {
+      title: req.body.title,
+      content: req.body.content,
+      imageUrl: req.body.imageUrl,
+      categoryId: req.body.categoryId,
+    };
+    const userId = 1;
 
-    await models.Post.update(updatePost, {where:{id:postId, userId:userId}})
+    await models.Post.update(updatePost, {
+      where: { id: postId, userId: userId },
+    });
     const updatedPost = await models.Post.findByPk(postId);
-
 
     res.status(200).json({
       message: "Post updated successfully",
